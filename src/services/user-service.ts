@@ -5,11 +5,13 @@ import type { DatabaseClient } from "../../lib/prisma";
 export type CreateUserData = {
   name: string;
   phone?: string | undefined;
+  email?: string | undefined;
 };
 
 export type UpdateUserData = {
   name?: string | undefined;
   phone?: string | undefined;
+  email?: string | undefined;
 };
 
 export class UserService {
@@ -24,6 +26,7 @@ export class UserService {
     const payload: Prisma.UserCreateInput = {
       name: data.name,
       phone: data.phone ?? null,
+      email: data.email ?? null,
     };
     return this.prisma.user.create({ data: payload });
   }
@@ -48,6 +51,9 @@ export class UserService {
     }
     if (data.phone !== undefined) {
       payload.phone = data.phone ?? null;
+    }
+    if (data.email !== undefined) {
+      payload.email = data.email ?? null;
     }
 
     return this.prisma.user.update({ where: { id }, data: payload });

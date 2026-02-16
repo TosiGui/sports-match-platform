@@ -1,15 +1,15 @@
-import type { Prisma } from "../../generated/prisma/client";
+import { ParticipantStatus, type Prisma } from "../../generated/prisma/client";
 import { container, TOKENS } from "../../lib/container";
 import type { DatabaseClient } from "../../lib/prisma";
 
 export type JoinMatchData = {
   matchId: string;
   userId: string;
-  status: string;
+  status: ParticipantStatus;
 };
 
 export type UpdateParticipantStatusData = {
-  status: string;
+  status: ParticipantStatus;
 };
 
 export class MatchParticipantService {
@@ -52,10 +52,10 @@ export class MatchParticipantService {
     }
 
     const confirmedCount = match.participants.filter(
-      (p) => p.status === "confirmed"
+      (p) => p.status === ParticipantStatus.CONFIRMED
     ).length;
 
-    if (data.status === "confirmed" && confirmedCount >= match.maxPlayers) {
+    if (data.status === ParticipantStatus.CONFIRMED && confirmedCount >= match.maxPlayers) {
       throw new Error("Match is full");
     }
 
@@ -82,7 +82,7 @@ export class MatchParticipantService {
     });
   }
 
-  async updateParticipantStatus(id: string, status: string) {
+  async updateParticipantStatus(id: string, status: ParticipantStatus) {
     const participant = await this.prisma.matchParticipant.findUnique({
       where: { id },
       include: {
@@ -98,9 +98,9 @@ export class MatchParticipantService {
       return null;
     }
 
-    if (status === "confirmed" && participant.status !== "confirmed") {
+    if (status === ParticipantStatus.CONFIRMED && participant.status !== ParticipantStatus.CONFIRMED) {
       const confirmedCount = participant.match.participants.filter(
-        (p) => p.status === "confirmed"
+        (p) => p.status === ParticipantStatus.CONFIRMED
       ).length;
 
       if (confirmedCount >= participant.match.maxPlayers) {

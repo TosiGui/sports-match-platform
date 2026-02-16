@@ -9,6 +9,7 @@ import type { CreateUserData, UpdateUserData } from "../services/user-service";
 const createUserSchema = z.object({
   name: z.string().min(1, "Name is required"),
   phone: z.string().min(8).max(32).optional(),
+  email: z.string().email("Invalid email format").optional(),
 });
 
 const updateUserSchema = createUserSchema
