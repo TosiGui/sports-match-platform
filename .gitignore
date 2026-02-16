@@ -3,3 +3,5 @@ pnpm-workspace.yaml
 package-lock.json
 node_modules
 dist
+.env
+/generated/prisma
