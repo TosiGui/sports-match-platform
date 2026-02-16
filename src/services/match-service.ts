@@ -1,24 +1,28 @@
-import type { Prisma } from "../../generated/prisma/client";
+import { type Prisma, type Sport, MatchStatus } from "../../generated/prisma/client";
 import { container, TOKENS } from "../../lib/container";
 import type { DatabaseClient } from "../../lib/prisma";
 
 export type CreateMatchData = {
-  sport: string;
+  sport: Sport;
   dateTime: Date;
   location: string;
   maxPlayers: number;
   organizerId: string;
+  cityId: string;
+  courtId?: string | undefined;
 };
 
 export type UpdateMatchData = {
-  sport?: string | undefined;
+  sport?: Sport | undefined;
   dateTime?: Date | undefined;
   location?: string | undefined;
   maxPlayers?: number | undefined;
+  status?: MatchStatus | undefined;
+  courtId?: string | undefined;
 };
 
 export type MatchFilters = {
-  sport?: string;
+  sport?: Sport;
   organizerId?: string;
 };
 
@@ -39,14 +43,43 @@ export class MatchService {
       throw new Error("Organizer not found");
     }
 
+    const cityExists = await this.prisma.city.findUnique({
+      where: { id: data.cityId },
+    });
+
+    if (!cityExists) {
+      throw new Error("City not found");
+    }
+
+    if (data.courtId) {
+      const courtExists = await this.prisma.court.findUnique({
+        where: { id: data.courtId },
+      });
+
+      if (!courtExists) {
+        throw new Error("Court not found");
+      }
+    }
+
     const payload: Prisma.MatchCreateInput = {
       sport: data.sport,
       dateTime: data.dateTime,
       location: data.location,
       maxPlayers: data.maxPlayers,
+      status: MatchStatus.OPEN,
       organizer: {
         connect: { id: data.organizerId },
       },
+      city: {
+        connect: { id: data.cityId },
+      },
+      ...(data.courtId
+        ? {
+            court: {
+              connect: { id: data.courtId },
+            },
+          }
+        : {}),
     };
 
     return this.prisma.match.create({ data: payload });
@@ -68,6 +101,8 @@ export class MatchService {
       orderBy: { createdAt: "desc" },
       include: {
         organizer: true,
+        city: true,
+        court: true,
         participants: {
           include: {
             user: true,
@@ -82,6 +117,8 @@ export class MatchService {
       where: { id },
       include: {
         organizer: true,
+        city: true,
+        court: true,
         participants: {
           include: {
             user: true,
@@ -109,6 +146,16 @@ export class MatchService {
     }
     if (data.maxPlayers !== undefined) {
       payload.maxPlayers = data.maxPlayers;
+    }
+    if (data.status !== undefined) {
+      payload.status = data.status;
+    }
+    if (data.courtId !== undefined) {
+      payload.court = data.courtId ? {
+        connect: { id: data.courtId },
+      } : {
+        disconnect: true,
+      };
     }
 
     return this.prisma.match.update({ where: { id }, data: payload });

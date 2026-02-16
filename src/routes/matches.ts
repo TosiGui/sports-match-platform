@@ -12,6 +12,8 @@ const createMatchSchema = z.object({
   location: z.string().min(1, "Location is required"),
   maxPlayers: z.number().int().min(1, "Max players must be at least 1"),
   organizerId: z.string().uuid("Invalid organizer id"),
+  cityId: z.string().uuid("Invalid city id"),
+  courtId: z.string().uuid("Invalid court id").optional(),
 });
 
 const updateMatchSchema = z
@@ -20,6 +22,8 @@ const updateMatchSchema = z
     dateTime: z.string().datetime().optional(),
     location: z.string().min(1).optional(),
     maxPlayers: z.number().int().min(1).optional(),
+    status: z.string().optional(),
+    courtId: z.string().uuid("Invalid court id").optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: "At least one field must be provided",
@@ -55,7 +59,10 @@ export async function registerMatchRoutes(
       const match = await controller.createMatch(matchData);
       return reply.code(201).send(match);
     } catch (error) {
-      if (error instanceof Error && error.message === "Organizer not found") {
+      if (error instanceof Error && 
+          (error.message === "Organizer not found" || 
+           error.message === "City not found" || 
+           error.message === "Court not found")) {
         return reply.code(404).send({ message: error.message });
       }
       throw error;
@@ -102,6 +109,12 @@ export async function registerMatchRoutes(
     }
     if (data.maxPlayers !== undefined) {
       updateData.maxPlayers = data.maxPlayers;
+    }
+    if (data.status !== undefined) {
+      updateData.status = data.status;
+    }
+    if (data.courtId !== undefined) {
+      updateData.courtId = data.courtId;
     }
 
     const match = await controller.updateMatch(id, updateData);

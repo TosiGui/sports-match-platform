@@ -57,7 +57,10 @@ describe("Match routes", () => {
         dateTime: data.dateTime,
         location: data.location,
         maxPlayers: data.maxPlayers,
+        status: "OPEN" as any,
         organizerId: data.organizerId,
+        cityId: data.cityId,
+        courtId: null,
         createdAt: new Date(),
       }),
     });
@@ -72,6 +75,7 @@ describe("Match routes", () => {
         location: "Stadium A",
         maxPlayers: 10,
         organizerId: "11111111-1111-4111-8111-111111111111",
+        cityId: "22222222-2222-4222-8222-222222222222",
       },
     });
 
@@ -82,6 +86,7 @@ describe("Match routes", () => {
       location: "Stadium A",
       maxPlayers: 10,
       organizerId: "11111111-1111-4111-8111-111111111111",
+      cityId: "22222222-2222-4222-8222-222222222222",
     });
   });
 
@@ -102,6 +107,7 @@ describe("Match routes", () => {
         location: "Stadium A",
         maxPlayers: 10,
         organizerId: "99999999-9999-4999-8999-999999999999",
+        cityId: "11111111-1111-4111-8111-111111111111",
       },
     });
 
