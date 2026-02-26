@@ -18,9 +18,15 @@
     "prisma": "^7.4.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "@types/jsonwebtoken": "^9.0.6"
   },
   "dependencies": {
+    "googleapis": "^134.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "@fastify/jwt": "^8.0.0",
+    "@fastify/cookie": "^10.0.0",
+    "@fastify/cors": "^10.0.0",
     "@prisma/adapter-pg": "^7.4.0",
     "@prisma/client": "^7.4.0",
     "dotenv": "^17.3.1",

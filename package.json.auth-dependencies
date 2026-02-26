@@ -1,0 +1,16 @@
+{
+  "note": "Adicione estas dependências ao seu package.json",
+  "dependencies": {
+    "googleapis": "^134.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "@fastify/jwt": "^8.0.0",
+    "@fastify/cookie": "^10.0.0",
+    "@fastify/cors": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6"
+  },
+  "scripts": {
+    "auth:cleanup-sessions": "node --loader ts-node/esm src/jobs/cleanup-sessions.ts"
+  }
+}
