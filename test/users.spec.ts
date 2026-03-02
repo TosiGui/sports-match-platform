@@ -14,7 +14,7 @@ type ControllerMock = UserControllerContract & {
 
 function createControllerMock(overrides?: Partial<UserControllerContract>): ControllerMock {
   return {
-    createUser: vi.fn(overrides?.createUser ?? (async () => ({ id: "1", name: "John", phone: null, createdAt: new Date(), matches: [], organizedMatches: [] }))),
+    createUser: vi.fn(overrides?.createUser ?? (async () => ({ id: "1", name: "John", phone: null, email: null, googleId: null, avatar: null, createdAt: new Date(), matches: [], organizedMatches: [] }))),
     listUsers: vi.fn(overrides?.listUsers ?? (async () => [])),
     getUserById: vi.fn(overrides?.getUserById ?? (async () => null)),
     updateUser: vi.fn(overrides?.updateUser ?? (async () => null)),
@@ -47,9 +47,10 @@ describe("User routes", () => {
         id: "user-1",
         name: data.name,
         phone: data.phone ?? null,
+        email: null,
+        googleId: null,
+        avatar: null,
         createdAt: new Date(),
-        matches: [],
-        organizedMatches: [],
       }),
     });
     const app = await buildApp(controller);
@@ -81,6 +82,9 @@ describe("User routes", () => {
         id: "user-1",
         name: data.name ?? "John",
         phone: data.phone ?? null,
+        email: null,
+        googleId: null,
+        avatar: null,
         createdAt: new Date(),
         matches: [],
         organizedMatches: [],
@@ -101,8 +105,8 @@ describe("User routes", () => {
   it("lists all users", async () => {
     const controller = createControllerMock({
       listUsers: async () => [
-        { id: "1", name: "User 1", phone: null, createdAt: new Date(), matches: [], organizedMatches: [] },
-        { id: "2", name: "User 2", phone: "12345678", createdAt: new Date(), matches: [], organizedMatches: [] },
+        { id: "1", name: "User 1", phone: null, email: null, googleId: null, avatar: null, createdAt: new Date() },
+        { id: "2", name: "User 2", phone: "12345678", email: null, googleId: null, avatar: null, createdAt: new Date() },
       ],
     });
     const app = await buildApp(controller);
@@ -249,9 +253,10 @@ describe("User routes", () => {
         id: "user-1",
         name: data.name,
         phone: data.phone ?? null,
+        email: null,
+        googleId: null,
+        avatar: null,
         createdAt: new Date(),
-        matches: [],
-        organizedMatches: [],
       }),
     });
     const app = await buildApp(controller);
@@ -272,9 +277,10 @@ describe("User routes", () => {
         id: "user-1",
         name: data.name ?? "Original",
         phone: "12345678",
+        email: null,
+        googleId: null,
+        avatar: null,
         createdAt: new Date(),
-        matches: [],
-        organizedMatches: [],
       }),
     });
     const app = await buildApp(controller);
@@ -295,9 +301,10 @@ describe("User routes", () => {
         id: "user-1",
         name: "John",
         phone: data.phone ?? null,
+        email: null,
+        googleId: null,
+        avatar: null,
         createdAt: new Date(),
-        matches: [],
-        organizedMatches: [],
       }),
     });
     const app = await buildApp(controller);

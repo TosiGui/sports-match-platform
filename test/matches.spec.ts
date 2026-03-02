@@ -16,11 +16,16 @@ function createControllerMock(overrides?: Partial<MatchControllerContract>): Con
   return {
     createMatch: vi.fn(overrides?.createMatch ?? (async () => ({
       id: "match-1",
-      sport: "Football",
+      sport: "Football" as any,
       dateTime: new Date(),
       location: "Stadium",
       maxPlayers: 10,
+      status: "OPEN" as any,
+      isPrivate: false,
+      shareCode: null,
       organizerId: "org-1",
+      cityId: "city-1",
+      courtId: null,
       createdAt: new Date(),
     }))),
     listMatches: vi.fn(overrides?.listMatches ?? (async () => [])),
@@ -53,11 +58,13 @@ describe("Match routes", () => {
     const controller = createControllerMock({
       createMatch: async (data) => ({
         id: "match-1",
-        sport: data.sport,
+        sport: data.sport as any,
         dateTime: data.dateTime,
         location: data.location,
         maxPlayers: data.maxPlayers,
         status: "OPEN" as any,
+        isPrivate: data.isPrivate ?? false,
+        shareCode: data.shareCode ?? null,
         organizerId: data.organizerId,
         cityId: data.cityId,
         courtId: null,
@@ -87,6 +94,9 @@ describe("Match routes", () => {
       maxPlayers: 10,
       organizerId: "11111111-1111-4111-8111-111111111111",
       cityId: "22222222-2222-4222-8222-222222222222",
+      courtId: undefined,
+      isPrivate: undefined,
+      shareCode: undefined,
     });
   });
 
@@ -119,20 +129,30 @@ describe("Match routes", () => {
       listMatches: async () => [
         {
           id: "match-1",
-          sport: "Football",
+          sport: "Football" as any,
           dateTime: new Date(),
           location: "Stadium A",
           maxPlayers: 10,
+          status: "OPEN" as any,
+          isPrivate: false,
+          shareCode: null,
           organizerId: "org-1",
+          cityId: "city-1",
+          courtId: null,
           createdAt: new Date(),
         },
         {
           id: "match-2",
-          sport: "Basketball",
+          sport: "Basketball" as any,
           dateTime: new Date(),
           location: "Court B",
           maxPlayers: 8,
+          status: "OPEN" as any,
+          isPrivate: false,
+          shareCode: null,
           organizerId: "org-2",
+          cityId: "city-2",
+          courtId: null,
           createdAt: new Date(),
         },
       ],
@@ -150,15 +170,20 @@ describe("Match routes", () => {
   it("filters matches by sport", async () => {
     const controller = createControllerMock({
       listMatches: async (filters) => {
-        if (filters?.sport === "Football") {
+        if ((filters?.sport as any) === "FOOTBALL") {
           return [
             {
               id: "match-1",
-              sport: "Football",
+              sport: "FOOTBALL" as any,
               dateTime: new Date(),
               location: "Stadium A",
               maxPlayers: 10,
+              status: "OPEN" as any,
+              isPrivate: false,
+              shareCode: null,
               organizerId: "org-1",
+              cityId: "city-1",
+              courtId: null,
               createdAt: new Date(),
             },
           ];
@@ -171,7 +196,7 @@ describe("Match routes", () => {
     const response = await app.inject({ method: "GET", url: "/matches?sport=Football" });
 
     expect(response.statusCode).toBe(200);
-    expect(controller.listMatches).toHaveBeenCalledWith({ sport: "Football" });
+    expect(controller.listMatches).toHaveBeenCalledWith({ sport: "FOOTBALL" });
   });
 
   it("filters matches by organizerId", async () => {
@@ -181,11 +206,16 @@ describe("Match routes", () => {
           return [
             {
               id: "match-1",
-              sport: "Football",
+              sport: "Football" as any,
               dateTime: new Date(),
               location: "Stadium A",
               maxPlayers: 10,
+              status: "OPEN" as any,
+              isPrivate: false,
+              shareCode: null,
               organizerId: "11111111-1111-4111-8111-111111111111",
+              cityId: "city-1",
+              courtId: null,
               createdAt: new Date(),
             },
           ];
@@ -210,11 +240,16 @@ describe("Match routes", () => {
     const controller = createControllerMock({
       getMatchById: async () => ({
         id: "match-1",
-        sport: "Football",
+        sport: "Football" as any,
         dateTime: new Date(),
         location: "Stadium A",
         maxPlayers: 10,
+        status: "OPEN" as any,
+        isPrivate: false,
+        shareCode: null,
         organizerId: "org-1",
+        cityId: "city-1",
+        courtId: null,
         createdAt: new Date(),
       }),
     });
@@ -247,11 +282,16 @@ describe("Match routes", () => {
     const controller = createControllerMock({
       updateMatch: async (_id, data) => ({
         id: "match-1",
-        sport: data.sport ?? "Football",
+        sport: (data.sport ?? "Football") as any,
         dateTime: data.dateTime ?? new Date(),
         location: data.location ?? "Stadium A",
         maxPlayers: data.maxPlayers ?? 10,
+        status: "OPEN" as any,
+        isPrivate: false,
+        shareCode: null,
         organizerId: "org-1",
+        cityId: "city-1",
+        courtId: null,
         createdAt: new Date(),
       }),
     });
@@ -265,7 +305,7 @@ describe("Match routes", () => {
 
     expect(response.statusCode).toBe(200);
     expect(controller.updateMatch).toHaveBeenCalledWith("44444444-4444-4444-8444-444444444444", {
-      sport: "Basketball",
+      sport: "BASKETBALL",
     });
   });
 
@@ -462,11 +502,16 @@ describe("Match routes", () => {
     const controller = createControllerMock({
       updateMatch: async (_id, data) => ({
         id: "match-1",
-        sport: data.sport ?? "Football",
+        sport: (data.sport ?? "Football") as any,
         dateTime: new Date(),
         location: "Stadium A",
         maxPlayers: 10,
+        status: "OPEN" as any,
+        isPrivate: false,
+        shareCode: null,
         organizerId: "org-1",
+        cityId: "city-1",
+        courtId: null,
         createdAt: new Date(),
       }),
     });
@@ -480,7 +525,7 @@ describe("Match routes", () => {
 
     expect(response.statusCode).toBe(200);
     expect(controller.updateMatch).toHaveBeenCalledWith("99999999-9999-4999-8999-999999999999", {
-      sport: "Basketball",
+      sport: "BASKETBALL",
     });
   });
 
@@ -488,11 +533,16 @@ describe("Match routes", () => {
     const controller = createControllerMock({
       updateMatch: async (_id, data) => ({
         id: "match-1",
-        sport: "Football",
+        sport: "Football" as any,
         dateTime: new Date(),
         location: data.location ?? "Stadium A",
         maxPlayers: 10,
+        status: "OPEN" as any,
+        isPrivate: false,
+        shareCode: null,
         organizerId: "org-1",
+        cityId: "city-1",
+        courtId: null,
         createdAt: new Date(),
       }),
     });
@@ -514,11 +564,16 @@ describe("Match routes", () => {
     const controller = createControllerMock({
       updateMatch: async (_id, data) => ({
         id: "match-1",
-        sport: "Football",
+        sport: "Football" as any,
         dateTime: new Date(),
         location: "Stadium A",
         maxPlayers: data.maxPlayers ?? 10,
+        status: "OPEN" as any,
+        isPrivate: false,
+        shareCode: null,
         organizerId: "org-1",
+        cityId: "city-1",
+        courtId: null,
         createdAt: new Date(),
       }),
     });
@@ -540,11 +595,16 @@ describe("Match routes", () => {
     const controller = createControllerMock({
       updateMatch: async (_id, data) => ({
         id: "match-1",
-        sport: "Football",
+        sport: "Football" as any,
         dateTime: data.dateTime ?? new Date(),
         location: "Stadium A",
         maxPlayers: 10,
+        status: "OPEN" as any,
+        isPrivate: false,
+        shareCode: null,
         organizerId: "org-1",
+        cityId: "city-1",
+        courtId: null,
         createdAt: new Date(),
       }),
     });

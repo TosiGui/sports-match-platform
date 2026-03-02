@@ -10,6 +10,8 @@ export type CreateMatchData = {
   organizerId: string;
   cityId: string;
   courtId?: string | undefined;
+  isPrivate?: boolean | undefined;
+  shareCode?: string | undefined;
 };
 
 export type UpdateMatchData = {
@@ -19,6 +21,8 @@ export type UpdateMatchData = {
   maxPlayers?: number | undefined;
   status?: MatchStatus | undefined;
   courtId?: string | undefined;
+  isPrivate?: boolean | undefined;
+  shareCode?: string | undefined;
 };
 
 export type MatchFilters = {
@@ -67,6 +71,8 @@ export class MatchService {
       location: data.location,
       maxPlayers: data.maxPlayers,
       status: MatchStatus.OPEN,
+      isPrivate: data.isPrivate ?? false,
+      shareCode: data.shareCode ?? null,
       organizer: {
         connect: { id: data.organizerId },
       },
@@ -102,7 +108,11 @@ export class MatchService {
       include: {
         organizer: true,
         city: true,
-        court: true,
+        court: {
+          include: {
+            club: true,
+          },
+        },
         participants: {
           include: {
             user: true,
@@ -118,7 +128,11 @@ export class MatchService {
       include: {
         organizer: true,
         city: true,
-        court: true,
+        court: {
+          include: {
+            club: true,
+          },
+        },
         participants: {
           include: {
             user: true,
@@ -156,6 +170,12 @@ export class MatchService {
       } : {
         disconnect: true,
       };
+    }
+    if (data.isPrivate !== undefined) {
+      payload.isPrivate = data.isPrivate;
+    }
+    if (data.shareCode !== undefined) {
+      payload.shareCode = data.shareCode;
     }
 
     return this.prisma.match.update({ where: { id }, data: payload });

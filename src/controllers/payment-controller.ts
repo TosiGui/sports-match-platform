@@ -23,7 +23,7 @@ export class PaymentController implements PaymentControllerContract {
   }
 
   async listPayments(matchId?: string, userId?: string, status?: string) {
-    return this.service.listPayments(matchId, userId, status);
+    return this.service.listPayments(matchId, userId, status as any);
   }
 
   async getPaymentById(id: string) {

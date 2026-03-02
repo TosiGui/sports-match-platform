@@ -5,6 +5,8 @@ import {
   type MatchControllerContract,
 } from "../controllers/match-controller";
 import type { CreateMatchData, UpdateMatchData, MatchFilters } from "../services/match-service";
+import { serializeMatch, serializeMatches } from "../serializers/match-serializer";
+import type { Sport, MatchStatus } from "../../generated/prisma/client";
 
 const createMatchSchema = z.object({
   sport: z.string().min(1, "Sport is required"),
@@ -14,6 +16,8 @@ const createMatchSchema = z.object({
   organizerId: z.string().uuid("Invalid organizer id"),
   cityId: z.string().uuid("Invalid city id"),
   courtId: z.string().uuid("Invalid court id").optional(),
+  isPrivate: z.boolean().optional(),
+  shareCode: z.string().optional(),
 });
 
 const updateMatchSchema = z
@@ -51,13 +55,21 @@ export async function registerMatchRoutes(
   app.post("/matches", async (request, reply) => {
     const data = createMatchSchema.parse(request.body);
     const matchData: CreateMatchData = {
-      ...data,
+      sport: data.sport as any,
       dateTime: new Date(data.dateTime),
+      location: data.location,
+      maxPlayers: data.maxPlayers,
+      organizerId: data.organizerId,
+      cityId: data.cityId,
+      courtId: data.courtId,
+      isPrivate: data.isPrivate,
+      shareCode: data.shareCode,
     };
 
     try {
-      const match = await controller.createMatch(matchData);
-      return reply.code(201).send(match);
+      const created = await controller.createMatch(matchData);
+      const full = await controller.getMatchById(created.id);
+      return reply.code(201).send(full ? serializeMatch(full as any) : created);
     } catch (error) {
       if (error instanceof Error && 
           (error.message === "Organizer not found" || 
@@ -74,14 +86,14 @@ export async function registerMatchRoutes(
     const filters: MatchFilters = {};
 
     if (query.sport) {
-      filters.sport = query.sport;
+      filters.sport = query.sport.toUpperCase() as Sport;
     }
     if (query.organizerId) {
       filters.organizerId = query.organizerId;
     }
 
     const matches = await controller.listMatches(filters);
-    return reply.send(matches);
+    return reply.send(serializeMatches(matches as any));
   });
 
   app.get("/matches/:id", async (request, reply) => {
@@ -90,7 +102,7 @@ export async function registerMatchRoutes(
     if (!match) {
       return reply.code(404).send({ message: "Match not found" });
     }
-    return reply.send(match);
+    return reply.send(serializeMatch(match as any));
   });
 
   app.patch("/matches/:id", async (request, reply) => {
@@ -99,7 +111,7 @@ export async function registerMatchRoutes(
 
     const updateData: UpdateMatchData = {};
     if (data.sport !== undefined) {
-      updateData.sport = data.sport;
+      updateData.sport = data.sport.toUpperCase() as Sport;
     }
     if (data.dateTime !== undefined) {
       updateData.dateTime = new Date(data.dateTime);
@@ -111,17 +123,18 @@ export async function registerMatchRoutes(
       updateData.maxPlayers = data.maxPlayers;
     }
     if (data.status !== undefined) {
-      updateData.status = data.status;
+      updateData.status = data.status.toUpperCase() as MatchStatus;
     }
     if (data.courtId !== undefined) {
       updateData.courtId = data.courtId;
     }
 
-    const match = await controller.updateMatch(id, updateData);
-    if (!match) {
+    const updated = await controller.updateMatch(id, updateData);
+    if (!updated) {
       return reply.code(404).send({ message: "Match not found" });
     }
-    return reply.send(match);
+    const full = await controller.getMatchById(id);
+    return reply.send(full ? serializeMatch(full as any) : updated);
   });
 
   app.delete("/matches/:id", async (request, reply) => {

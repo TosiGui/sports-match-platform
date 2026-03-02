@@ -5,8 +5,8 @@ function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function pick<T>(arr: T[]) {
-  return arr[Math.floor(Math.random() * arr.length)];
+function pick<T>(arr: readonly T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)]!;
 }
 
 function daysFromNow(days: number) {
@@ -75,7 +75,7 @@ async function main() {
   }
 
   // Matches
-  const sports = ["VOLEI", "PADEL"] as const;
+  const sports = ["TENNIS", "PADEL"] as const;
 
   const createdMatches: any[] = [];
   for (let i = 0; i < 6; i++) {

@@ -23,7 +23,7 @@ export class PlayerStatsController implements PlayerStatsControllerContract {
   }
 
   async listPlayerStats(userId?: string, sport?: string) {
-    return this.service.listPlayerStats(userId, sport);
+    return this.service.listPlayerStats(userId, sport as any);
   }
 
   async getPlayerStatsById(id: string) {

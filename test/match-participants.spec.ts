@@ -17,7 +17,7 @@ function createControllerMock(overrides?: Partial<MatchParticipantControllerCont
       id: "participant-1",
       matchId: "match-1",
       userId: "user-1",
-      status: "pending",
+      status: "PENDING" as any,
       joinedAt: new Date(),
     }))),
     listParticipantsByMatch: vi.fn(overrides?.listParticipantsByMatch ?? (async () => [])),
@@ -70,7 +70,7 @@ describe("MatchParticipant routes", () => {
     expect(controller.joinMatch).toHaveBeenCalledWith({
       matchId: "11111111-1111-4111-8111-111111111111",
       userId: "22222222-2222-4222-8222-222222222222",
-      status: "pending",
+      status: "PENDING",
     });
   });
 
@@ -169,14 +169,14 @@ describe("MatchParticipant routes", () => {
           id: "participant-1",
           matchId: "11111111-1111-4111-8111-111111111111",
           userId: "user-1",
-          status: "confirmed",
+          status: "CONFIRMED" as any,
           joinedAt: new Date(),
         },
         {
           id: "participant-2",
           matchId: "11111111-1111-4111-8111-111111111111",
           userId: "user-2",
-          status: "pending",
+          status: "PENDING" as any,
           joinedAt: new Date(),
         },
       ],
@@ -217,7 +217,7 @@ describe("MatchParticipant routes", () => {
     expect(response.statusCode).toBe(200);
     expect(controller.updateParticipantStatus).toHaveBeenCalledWith(
       "33333333-3333-4333-8333-333333333333",
-      { status: "confirmed" }
+      { status: "CONFIRMED" }
     );
   });
 

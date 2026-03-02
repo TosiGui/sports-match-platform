@@ -5,6 +5,7 @@ import {
   type MatchParticipantControllerContract,
 } from "../controllers/match-participant-controller";
 import type { JoinMatchData, UpdateParticipantStatusData } from "../services/match-participant-service";
+import { ParticipantStatus } from "../../generated/prisma/client";
 
 const joinMatchSchema = z.object({
   userId: z.string().uuid("Invalid user id"),
@@ -48,7 +49,7 @@ export async function registerMatchParticipantRoutes(
     const joinData: JoinMatchData = {
       matchId,
       userId: data.userId,
-      status: data.status,
+      status: data.status.toUpperCase() as ParticipantStatus,
     };
 
     try {
@@ -84,7 +85,7 @@ export async function registerMatchParticipantRoutes(
     const data = updateStatusSchema.parse(request.body);
 
     const updateData: UpdateParticipantStatusData = {
-      status: data.status,
+      status: data.status.toUpperCase() as ParticipantStatus,
     };
 
     try {

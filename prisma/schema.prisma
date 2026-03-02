@@ -8,7 +8,7 @@ datasource db {
 }
 
 enum Sport {
-  VOLEI
+  TENNIS
   PADEL
 }
 
@@ -38,6 +38,8 @@ model User {
   name          String
   phone         String?            @unique
   email         String?            @unique
+  googleId      String?            @unique
+  avatar        String?
   createdAt     DateTime           @default(now())
 
   organizedMatches Match[]         @relation("OrganizerMatches")
@@ -94,6 +96,8 @@ model Match {
   location    String
   maxPlayers  Int
   status      MatchStatus   @default(OPEN)
+  isPrivate   Boolean       @default(false)
+  shareCode   String?
   organizerId String
   cityId      String
   courtId     String?
